@@ -1,0 +1,2 @@
+project(':openvpnLib').projectDir = new File(rootDir, 'example/android/openvpnLib/')
+include ':openvpnLib'
