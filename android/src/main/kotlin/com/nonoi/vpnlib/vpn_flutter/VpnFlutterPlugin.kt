@@ -1,25 +1,29 @@
 package com.nonoi.vpnlib.vpn_flutter
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat.startActivityForResult
 import de.blinkt.openvpn.OpenVpnApi
-import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.OpenVPNThread
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-
+import android.content.BroadcastReceiver
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 /** VpnFlutterPlugin */
-class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler{
+class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
+  companion object {
+    const val TAG = "vpn_flutter"
+  }
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -27,26 +31,58 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler{
   private lateinit var channel : MethodChannel
 
   private lateinit var _mContext : Context;
-  private var _activity: Activity? = null
+  private lateinit var _activity: Activity;
 
-   fun onAttachedToActivity(binding: ActivityPluginBinding) {
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    _activity = binding.activity
+    LocalBroadcastManager.getInstance(_mContext)
+      .registerReceiver(broadcastReceiver, IntentFilter("connectionState"))
+  }
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     _activity = binding.activity
   }
-   fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    _activity = binding.activity
+  override fun onDetachedFromActivityForConfigChanges() {
   }
+  override fun onDetachedFromActivity() {
+    LocalBroadcastManager.getInstance(_mContext).unregisterReceiver(broadcastReceiver)
+  }
+
+  var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      try {
+        //setStatus(intent.getStringExtra("state"))
+        val state = intent.getStringExtra("state").toString()
+        // update status...
+        //TODO:setStatus(state)
+      } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+      }
+      try {
+        var duration = intent.getStringExtra("duration")
+        var lastPacketReceive = intent.getStringExtra("lastPacketReceive")
+        var byteIn = intent.getStringExtra("byteIn")
+        var byteOut = intent.getStringExtra("byteOut")
+        if (duration == null) duration = "00:00:00"
+        if (lastPacketReceive == null) lastPacketReceive = "0"
+        if (byteIn == null) byteIn = " "
+        if (byteOut == null) byteOut = " "
+        Log.d(TAG, "openvpn val:" + duration.toString() + lastPacketReceive.toString() + byteIn.toString() + byteOut.toString())
+        //updateConnectionStatus(duration, lastPacketReceive, byteIn, byteOut)
+        //TLogger.writeln()
+        //Log.d(TAG, duration.toString() + lastPacketReceive.toString() + byteIn.toString() + byteOut.toString())
+      } catch (e: java.lang.Exception) {
+        e.printStackTrace()
+      }
+    }
+  }
+
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn_flutter")
     channel.setMethodCallHandler(this)
 
-
     _mContext = flutterPluginBinding.applicationContext;
-    val intent = VpnService.prepare(_mContext)
-    var status = OpenVPNService.getStatus()
-    Log.d("status:",status)
 
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    _mContext.startActivity(intent,Bundle(22));
+    //_mContext.startActivity(intent,Bundle(22));
 
   /*
     var config = ovpnconfig
@@ -65,6 +101,10 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler{
     when (call.method) {
         "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      }
+      "initovpn" -> {
+        val intent = VpnService.prepare(_mContext)
+        _activity.startActivityForResult(intent,1);
       }
       "connect" -> {
 /*        val intent = VpnService.prepare(_mContext);

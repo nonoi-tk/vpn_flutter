@@ -14,7 +14,7 @@ abstract class VpnFlutterPlatform extends PlatformInterface {
   ///
   /// Defaults to [MethodChannelVpnFlutter].
   static VpnFlutterPlatform get instance => _instance;
-  
+
   /// Platform-specific implementations should set this with their own
   /// platform-specific class that extends [VpnFlutterPlatform] when
   /// they register themselves.
@@ -26,11 +26,16 @@ abstract class VpnFlutterPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<void> initovpn() {
+    throw UnimplementedError('initovpn() has not been implemented.');
+  }
+
   Future<void> connect() {
     throw UnimplementedError('connect() has not been implemented.');
   }
+
   Future<void> disconnect() {
     throw UnimplementedError('disconnect() has not been implemented.');
   }
-
 }

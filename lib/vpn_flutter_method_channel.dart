@@ -11,13 +11,19 @@ class MethodChannelVpnFlutter extends VpnFlutterPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  Future<void> initovpn() async {
+    await methodChannel.invokeMethod<String>('initovpn');
   }
 
   Future<void> connect() async {
     await methodChannel.invokeMethod<String>('connect');
   }
+
   Future<void> disconnect() async {
     await methodChannel.invokeMethod<String>('disconnect');
   }

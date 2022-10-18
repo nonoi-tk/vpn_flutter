@@ -33,8 +33,8 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _vpnFlutterPlugin.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = await _vpnFlutterPlugin.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -60,6 +60,13 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              TextButton(
+                child: const Text("init"),
+                onPressed: () async {
+                  await _vpnFlutterPlugin.initovpn();
+                  // initPlatformState();
+                },
+              ),
               TextButton(
                 child: const Text("Start"),
                 onPressed: () async {
@@ -89,7 +96,7 @@ class _MyAppState extends State<MyApp> {
                 */
             ],
           ),
-                    // child: Text('Running on: $_platformVersion\n'),
+          // child: Text('Running on: $_platformVersion\n'),
         ),
       ),
     );
