@@ -5,4 +5,10 @@ class VpnFlutter {
   Future<String?> getPlatformVersion() {
     return VpnFlutterPlatform.instance.getPlatformVersion();
   }
+  Future<void> connect() {
+    return VpnFlutterPlatform.instance.connect();
+  }
+  Future<void> disconnect() {
+    return VpnFlutterPlatform.instance.disconnect();
+  }
 }

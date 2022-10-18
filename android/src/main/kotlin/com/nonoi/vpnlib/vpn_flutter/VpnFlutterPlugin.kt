@@ -1,17 +1,22 @@
 package com.nonoi.vpnlib.vpn_flutter
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.VpnService
+import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
 import de.blinkt.openvpn.OpenVpnApi
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.OpenVPNThread
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+
 
 /** VpnFlutterPlugin */
 class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler{
@@ -21,32 +26,75 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler{
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
 
+  private lateinit var _mContext : Context;
+  private var _activity: Activity? = null
+
+   fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    _activity = binding.activity
+  }
+   fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    _activity = binding.activity
+  }
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn_flutter")
     channel.setMethodCallHandler(this)
 
-    var mContext = flutterPluginBinding.applicationContext;
-    val intent = VpnService.prepare(mContext)
+
+    _mContext = flutterPluginBinding.applicationContext;
+    val intent = VpnService.prepare(_mContext)
     var status = OpenVPNService.getStatus()
     Log.d("status:",status)
+
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    _mContext.startActivity(intent,Bundle(22));
+
+  /*
     var config = ovpnconfig
     OpenVpnApi.startVpn(
-      mContext,
+      _mContext,
       config,
       "Japan",
-      "username",
-      "password"
+      "V202200073301",
+      "5WAqZ3Ys2D9H"
     )
-
+*/
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+
+    when (call.method) {
+        "getPlatformVersion" -> {
+        result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      }
+      "connect" -> {
+/*        val intent = VpnService.prepare(_mContext);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        _mContext.startActivity(intent,Bundle(22));
+*/
+        var config = ovpnconfig
+        OpenVpnApi.startVpn(
+          _mContext,
+          config,
+          "Japan",
+          "V202200073301",
+          "5WAqZ3Ys2D9H"
+        )
+      }
+      "disconnect" -> {
+        OpenVPNThread.stop()
+      }
+      else -> {
+      }
+    }
+
+    /*
     if (call.method == "getPlatformVersion") {
       result.success("Android ${android.os.Build.VERSION.RELEASE}")
     } else {
       result.notImplemented()
     }
     OpenVPNThread.stop()
+    */
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

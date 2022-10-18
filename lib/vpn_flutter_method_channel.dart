@@ -14,4 +14,11 @@ class MethodChannelVpnFlutter extends VpnFlutterPlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  Future<void> connect() async {
+    await methodChannel.invokeMethod<String>('connect');
+  }
+  Future<void> disconnect() async {
+    await methodChannel.invokeMethod<String>('disconnect');
+  }
 }

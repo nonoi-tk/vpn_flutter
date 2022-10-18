@@ -26,4 +26,11 @@ abstract class VpnFlutterPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+  Future<void> connect() {
+    throw UnimplementedError('connect() has not been implemented.');
+  }
+  Future<void> disconnect() {
+    throw UnimplementedError('disconnect() has not been implemented.');
+  }
+
 }

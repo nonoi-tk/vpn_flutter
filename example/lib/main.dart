@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -55,7 +57,39 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                child: const Text("Start"),
+                onPressed: () async {
+                  await _vpnFlutterPlugin.connect();
+                  // initPlatformState();
+                },
+              ),
+              TextButton(
+                child: const Text("STOP"),
+                onPressed: () async {
+                  await _vpnFlutterPlugin.disconnect();
+                  // engine.disconnect();
+                },
+              ),
+              /*
+              if (Platform.isAndroid){}
+                TextButton(
+                  child: Text(_granted ? "Granted" : "Request Permission"),
+                  onPressed: () {
+                    engine.requestPermissionAndroid().then((value) {
+                      setState(() {
+                        _granted = value;
+                      });
+                    });
+                  },
+                ),
+                */
+            ],
+          ),
+                    // child: Text('Running on: $_platformVersion\n'),
         ),
       ),
     );
