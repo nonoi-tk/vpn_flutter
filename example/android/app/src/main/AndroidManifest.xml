@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nonoi.vpnlib.vpn_flutter_example">
+    package="com.nonoi.vpnlib.vpn_flutter_example"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -7,9 +9,13 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
    <application
+        android:allowBackup="false"
         android:label="vpn_flutter_example"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:extractNativeLibs="true"
+        tools:replace="android:extractNativeLibs"
+       >
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -36,6 +42,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <activity
+           android:name="de.blinkt.openvpn.DisconnectVPNActivity"
+           android:excludeFromRecents="true"
+           android:noHistory="true"
+           android:exported="false"
+           android:taskAffinity=".DisconnectVPN"
+           android:theme="@style/blinkt.dialog" />
+
        <service
            android:name="de.blinkt.openvpn.core.OpenVPNService"
            android:exported="false"

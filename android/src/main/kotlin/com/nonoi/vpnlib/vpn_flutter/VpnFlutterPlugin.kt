@@ -97,7 +97,7 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-
+    Log.d(TAG, "onMethodCall:" + call.method);
     when (call.method) {
         "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
