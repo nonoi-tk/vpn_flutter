@@ -131,6 +131,7 @@ public class OpenVPNThread implements Runnable {
     }
 
     private void startOpenVPNThreadArgs(String[] argv) {
+        Log.i(TAG, "Starting startOpenVPNThreadArgs");
         LinkedList<String> argvlist = new LinkedList<String>();
 
         Collections.addAll(argvlist, argv);
@@ -139,17 +140,25 @@ public class OpenVPNThread implements Runnable {
         // Hack O rama
 
         String lbpath = genLibraryPath(argv, pb);
-
+        //lbpath = "/data/data/com.nonoi.vpnlib.vpn_flutter_example/lib/libopenvpn.so";
         pb.environment().put("LD_LIBRARY_PATH", lbpath);
         pb.environment().put("TMPDIR", mTmpDir);
 
+        Log.i(TAG, "LD_LIBRARY_PATH:" + pb.environment().get("LD_LIBRARY_PATH"));
+        Log.i(TAG, "TMPDIR:" + pb.environment().get("TMPDIR"));
+
         pb.redirectErrorStream(true);
         try {
+            Log.i(TAG, "1");
             mProcess = pb.start();
+            //Log.i(TAG, "2");
             // Close the output, since we don't need it
             mProcess.getOutputStream().close();
+            //Log.i(TAG, "3");
             InputStream in = mProcess.getInputStream();
+            //Log.i(TAG, "4");
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            //Log.i(TAG, "5");
 
             while (true) {
                 String logline = br.readLine();
@@ -186,7 +195,9 @@ public class OpenVPNThread implements Runnable {
                     if ((msg.endsWith("md too weak") && msg.startsWith("OpenSSL: error")) || msg.contains("error:140AB18E"))
                         logerror = 1;
 
+                    //Log.i(TAG, "6");
                     VpnStatus.logMessageOpenVPN(logStatus, logLevel, msg);
+                    //Log.i(TAG, "7");
                     if (logerror==1)
                         VpnStatus.logError("OpenSSL reported a certificate with a weak hash, please the in app FAQ about weak hashes");
 
@@ -199,6 +210,7 @@ public class OpenVPNThread implements Runnable {
                 }
             }
         } catch (InterruptedException | IOException e) {
+            Log.e(TAG, "exception",e);
             VpnStatus.logException("Error reading from output of OpenVPN process", e);
             stopProcess();
         }
@@ -207,10 +219,18 @@ public class OpenVPNThread implements Runnable {
     }
 
     private String genLibraryPath(String[] argv, ProcessBuilder pb) {
+        for(int i=0; i < argv.length; i++){
+            Log.i(TAG, "argv[" + i + "]:" + argv[i]);
+        }
+        //System.loadLibrary("libovpnexec");
+        String gets = System.getenv("LD_LIBRARY_PATH");
+        Log.i(TAG, "getenv LD_LIBRARY_PATH:" + gets);
         // Hack until I find a good way to get the real library path
         String applibpath = argv[0].replaceFirst("/cache/.*$", "/lib");
+        Log.i(TAG, "applibpath:" + applibpath);
 
         String lbpath = pb.environment().get("LD_LIBRARY_PATH");
+        Log.i(TAG, "lbpath:" + lbpath);
         if (lbpath == null)
             lbpath = applibpath;
         else
@@ -219,6 +239,7 @@ public class OpenVPNThread implements Runnable {
         if (!applibpath.equals(mNativeDir)) {
             lbpath = mNativeDir + ":" + lbpath;
         }
+        Log.i(TAG, "lbpath:" + lbpath);
         return lbpath;
     }
 }

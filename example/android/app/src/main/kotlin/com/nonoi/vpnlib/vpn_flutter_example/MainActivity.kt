@@ -3,21 +3,22 @@ package com.nonoi.vpnlib.vpn_flutter_example
 import android.net.VpnService
 import android.os.Bundle
 import android.os.RemoteException
-import android.widget.Button
 import de.blinkt.openvpn.OpenVpnApi
-import de.blinkt.openvpn.R
 import de.blinkt.openvpn.core.OpenVPNThread
-import de.blinkt.openvpn.core.ProfileManager
-import de.blinkt.openvpn.core.VPNLaunchHelper
+import io.flutter.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugins.GeneratedPluginRegistrant
 import java.io.*
 
 class MainActivity: FlutterActivity() {
     private var vpnControlMethod: MethodChannel? = null
     private val METHOD_CHANNEL_VPN_CONTROL = "com.nonoi.vpnlib/vpncontrol"
+    companion object {
+        const val TAG = "vpn_flutter"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +32,10 @@ class MainActivity: FlutterActivity() {
             METHOD_CHANNEL_VPN_CONTROL
         )
         vpnControlMethod!!.setMethodCallHandler { call: MethodCall, result: MethodChannel.Result ->
+            Log.i(
+                TAG,
+                "call.method"
+            )
             when (call.method) {
                 "stop" -> {
                     OpenVPNThread.stop()
