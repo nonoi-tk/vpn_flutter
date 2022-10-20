@@ -9,6 +9,8 @@ class MethodChannelVpnFlutter extends VpnFlutterPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('vpn_flutter');
 
+  final methodChannel2 = const MethodChannel('com.nonoi.vpnlib/vpncontrol');
+
   @override
   Future<String?> getPlatformVersion() async {
     final version =
@@ -21,10 +23,12 @@ class MethodChannelVpnFlutter extends VpnFlutterPlatform {
   }
 
   Future<void> connect() async {
-    await methodChannel.invokeMethod<String>('connect');
+    //await methodChannel.invokeMethod<String>('connect');
+    await methodChannel2.invokeMethod<String>('start');
   }
 
   Future<void> disconnect() async {
-    await methodChannel.invokeMethod<String>('disconnect');
+    //await methodChannel.invokeMethod<String>('disconnect');
+    await methodChannel2.invokeMethod<String>('stop');
   }
 }

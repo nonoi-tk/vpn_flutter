@@ -16,8 +16,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import android.content.BroadcastReceiver
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+
 
 /** VpnFlutterPlugin */
 class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -35,8 +34,6 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     _activity = binding.activity
-    LocalBroadcastManager.getInstance(_mContext)
-      .registerReceiver(broadcastReceiver, IntentFilter("connectionState"))
   }
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     _activity = binding.activity
@@ -44,7 +41,6 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   override fun onDetachedFromActivityForConfigChanges() {
   }
   override fun onDetachedFromActivity() {
-    LocalBroadcastManager.getInstance(_mContext).unregisterReceiver(broadcastReceiver)
   }
 
   var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -97,7 +93,7 @@ class VpnFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    Log.d(TAG, "onMethodCall:" + call.method);
+
     when (call.method) {
         "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
